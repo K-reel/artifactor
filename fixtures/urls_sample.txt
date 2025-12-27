@@ -1,0 +1,9 @@
+# Sample URLs for testing Artifactor ingestion
+# Lines starting with # are comments and will be ignored
+
+# Socket blog posts
+https://socket.dev/blog/understanding-npm-security
+
+# Blank lines are ignored
+
+https://socket.dev/blog/another-article

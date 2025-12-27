@@ -1,0 +1,10 @@
+{
+  "title": "The Power of Treating Writing as an Artifact Pipeline",
+  "date": "2024-03-15",
+  "slug": "writing-as-artifact-pipeline",
+  "canonical_url": "https://example.com/blog/writing-artifact-pipeline",
+  "source": "Example Blog",
+  "authors": ["Jane Smith", "John Doe"],
+  "tags": ["writing", "productivity", "methodology"],
+  "html": "<p>In the world of software development, we've long understood the value of treating our code as artifacts that flow through a structured pipeline. But what if we applied this same methodology to our writing?</p>\n\n<h2>The Pipeline Mindset</h2>\n\n<p>When you treat writing as an artifact pipeline, you gain several key advantages:</p>\n\n<ul>\n  <li><strong>Reproducibility:</strong> Your writing process becomes repeatable and consistent</li>\n  <li><strong>Automation:</strong> Manual steps can be replaced with tooling</li>\n  <li><strong>Version Control:</strong> Every change is tracked and auditable</li>\n  <li><strong>Quality Gates:</strong> Automated checks ensure standards are met</li>\n</ul>\n\n<h2>From Source to Artifact</h2>\n\n<p>Just as code moves from source files to compiled binaries or deployed applications, writing can flow from rough drafts to polished, published pieces. The key is establishing clear stages in your pipeline:</p>\n\n<ol>\n  <li>Capture: Raw ideas and notes</li>\n  <li>Structure: Organized outlines and drafts</li>\n  <li>Refine: Edited and polished content</li>\n  <li>Publish: Formatted and deployed artifacts</li>\n</ol>\n\n<h2>Tools for the Pipeline</h2>\n\n<p>The beauty of this approach is that you can leverage the same tools that have revolutionized software development: version control systems, automated testing, continuous integration, and deployment pipelines.</p>\n\n<p>By thinking of your writing as artifacts moving through a pipeline, you unlock new levels of productivity and quality control.</p>"
+}
