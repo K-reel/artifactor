@@ -6,6 +6,12 @@
 
 **Artifactor** is a Python-based CLI tool that generates Jekyll HTML posts from structured article data. I treat my writing like an artifact pipeline.
 
+**Live demo:** https://k-reel.github.io/artifactor/
+
+![CI](https://github.com/K-reel/artifactor/actions/workflows/ci.yml/badge.svg)
+![Pages](https://github.com/K-reel/artifactor/actions/workflows/pages.yml/badge.svg)
+![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)
+
 ## What is Artifactor?
 
 Artifactor transforms article data into static site posts with deterministic, reproducible output. It can:
