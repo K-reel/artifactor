@@ -102,7 +102,7 @@ def ingest(
             "--user-agent",
             help="User-Agent header for requests",
         ),
-    ] = "Artifactor/0.1 (+https://github.com/user/artifactor)",
+    ] = "Artifactor/0.1 (+https://github.com/K-reel/artifactor)",
     limit: Annotated[
         Optional[int],
         typer.Option(

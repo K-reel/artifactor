@@ -44,7 +44,7 @@ class Ingester:
         self,
         output_dir: Path,
         timeout: int = 20,
-        user_agent: str = "Artifactor/0.1 (+https://github.com/user/artifactor)",
+        user_agent: str = "Artifactor/0.1 (+https://github.com/K-reel/artifactor)",
         dry_run: bool = False,
         html_fixture: Optional[Path] = None,
     ):

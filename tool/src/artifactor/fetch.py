@@ -30,7 +30,7 @@ class FetchResult:
 def fetch_url(
     url: str,
     timeout: int = 20,
-    user_agent: str = "Artifactor/0.1 (+https://github.com/user/artifactor)",
+    user_agent: str = "Artifactor/0.1 (+https://github.com/K-reel/artifactor)",
 ) -> FetchResult:
     """Fetch a URL and return the result.
 
