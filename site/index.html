@@ -51,9 +51,19 @@ layout: default
     a:hover {
       text-decoration: underline;
     }
+    .site-logo {
+      display: block;
+      margin-bottom: 1.5rem;
+    }
+    .site-logo img {
+      height: 48px;
+    }
   </style>
 </head>
 <body>
+  <a href="{{ '/' | relative_url }}" class="site-logo">
+    <img src="{{ '/assets/artifactor-logo.jpg' | relative_url }}" alt="Artifactor logo" />
+  </a>
   <header>
     <h1>{{ site.title }}</h1>
     <p class="tagline">{{ site.description }}</p>

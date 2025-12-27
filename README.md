@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="assets/artifactor-logo.jpg" alt="Artifactor logo" width="220" />
+</p>
+
 # Artifactor
 
 **Artifactor** is a Python-based CLI tool that generates Jekyll HTML posts from structured article data. I treat my writing like an artifact pipeline.
