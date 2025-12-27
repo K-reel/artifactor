@@ -1,8 +1,8 @@
 # Artifactor Site Configuration
 title: Artifactor
 description: Treating writing like an artifact pipeline
-baseurl: ""
-url: ""
+url: "https://k-reel.github.io"
+baseurl: "/artifactor"
 
 # Build settings
 markdown: kramdown
