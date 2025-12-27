@@ -28,6 +28,11 @@ Think of it as a build pipeline for content: stable inputs produce stable output
 - Jekyll site structure with layouts
 - Comprehensive test suite
 
+## Versioning
+
+- **v0.1.0**: Initial release (scaffold + ingest + offline fixture mode)
+- **v0.1.1**: Adds CI workflow (offline-only, runs on every push/PR)
+
 ## Repository Structure
 
 ```
