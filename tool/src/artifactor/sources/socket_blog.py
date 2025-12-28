@@ -193,10 +193,40 @@ class SocketBlogAdapter(SourceAdapter):
 
     def _extract_article_html(self, soup: BeautifulSoup) -> str:
         """Extract main article HTML content."""
-        # Find the main article container
-        article = soup.find("article")
+        article = None
+
+        # Strategy 1: Look for semantic content classes (prose, article-content, etc.)
+        # Socket.dev uses <div class="prose"> for main article body
+        semantic_selectors = [
+            {"class": "prose"},
+            {"class": re.compile(r"article-content", re.I)},
+            {"class": re.compile(r"post-content", re.I)},
+            {"class": re.compile(r"entry-content", re.I)},
+        ]
+
+        for selector in semantic_selectors:
+            article = soup.find("div", **selector)
+            if article:
+                break
+
+        # Strategy 2: Find H1 and score ancestor containers
+        if not article:
+            h1 = soup.find("h1")
+            if h1:
+                article = self._find_content_container(h1, soup)
+
+        # Strategy 3: Fallback to traditional selectors
+        if not article:
+            article = soup.find("article")
+            # Filter out small articles (likely cards/teasers, not main content)
+            if article:
+                text_len = len(article.get_text(strip=True))
+                if text_len < 500:  # Too small to be main article
+                    article = None
+
         if not article:
             article = soup.find("main")
+
         if not article:
             # Try to find div with class containing "post" or "article"
             article = soup.find("div", class_=re.compile(r"(post|article|content)-", re.I))
@@ -218,6 +248,66 @@ class SocketBlogAdapter(SourceAdapter):
         html = re.sub(r"\r", "\n", html)
 
         return html.strip()
+
+    def _find_content_container(self, h1, soup: BeautifulSoup):
+        """Find the best container for article content by scoring ancestors of H1."""
+        candidates = []
+
+        # Walk up the DOM tree from H1
+        parent = h1.parent
+        depth = 0
+        max_depth = 10
+
+        while parent and depth < max_depth and parent.name != "[document]":
+            # Score this container
+            score = 0
+            text_len = len(parent.get_text(strip=True))
+
+            # Prefer containers with substantial text (5k-20k chars is typical for articles)
+            if 3000 < text_len < 50000:
+                score += 10
+            elif text_len > 1000:
+                score += 5
+
+            # Prefer semantic tags
+            if parent.name in ("article", "main", "section"):
+                score += 3
+            elif parent.name == "div":
+                score += 1
+
+            # Prefer containers with content-related classes
+            classes = parent.get("class", [])
+            class_str = " ".join(classes).lower()
+            if any(keyword in class_str for keyword in ["content", "article", "post", "body"]):
+                score += 5
+
+            # Penalize containers with too many children (likely navigation/layout)
+            child_count = len(parent.find_all(recursive=False))
+            if child_count > 10:
+                score -= 2
+
+            # Penalize containers that are too large (likely body or root)
+            if text_len > 50000:
+                score -= 5
+
+            candidates.append({
+                "element": parent,
+                "score": score,
+                "text_len": text_len,
+                "depth": depth
+            })
+
+            parent = parent.parent
+            depth += 1
+
+        # Sort by score (highest first), then by depth (shallowest first)
+        candidates.sort(key=lambda x: (x["score"], -x["depth"]), reverse=True)
+
+        # Return the best candidate if any
+        if candidates and candidates[0]["score"] > 0:
+            return candidates[0]["element"]
+
+        return None
 
     def _clean_article(self, article):
         """Remove unwanted elements from article HTML."""

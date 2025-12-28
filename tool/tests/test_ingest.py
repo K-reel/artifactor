@@ -18,6 +18,14 @@ def socket_sample_html():
 
 
 @pytest.fixture
+def socket_modern_html():
+    """Load Socket blog modern Chakra UI fixture."""
+    # From tool/tests/test_ingest.py -> tool/ -> root -> fixtures/
+    fixture_path = Path(__file__).parent.parent.parent / "fixtures" / "socket_modern.html"
+    return fixture_path.read_text()
+
+
+@pytest.fixture
 def urls_sample_file():
     """Return path to sample URLs file."""
     # From tool/tests/test_ingest.py -> tool/ -> root -> fixtures/
@@ -285,3 +293,34 @@ def test_offline_mode_dry_run(socket_sample_html):
         # But file should NOT exist (dry run)
         post_path = posts_dir / result.filename
         assert not post_path.exists()
+
+
+def test_socket_adapter_modern_chakra_ui(socket_modern_html):
+    """Test Socket adapter correctly extracts prose div, not article cards."""
+    adapter = SocketBlogAdapter()
+    url = "https://socket.dev/blog/modern-chakra-post"
+
+    article = adapter.extract(url, socket_modern_html)
+
+    # Should extract metadata correctly
+    assert article.title == "Modern Socket Blog Post with Chakra UI"
+    assert article.date == "2024-11-15"
+    assert article.authors == ["Jane Developer"]
+
+    # Should contain main article content from prose div
+    assert "This is the main article content" in article.html
+    assert "technical details of the vulnerability" in article.html
+    assert "best practices and security considerations" in article.html
+
+    # Should contain section headings
+    assert "First Section" in article.html
+    assert "Second Section" in article.html
+
+    # Should NOT contain related posts section
+    assert "Related Posts" not in article.html
+    assert "Another Blog Post Title" not in article.html
+    assert "related post teaser" not in article.html
+    assert "Yet Another Related Post" not in article.html
+
+    # Should extract the prose div specifically (verify class is present)
+    assert 'class="prose"' in article.html
