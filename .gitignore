@@ -48,3 +48,5 @@ vendor/
 # OS
 .DS_Store
 Thumbs.db
+fixtures/real_socket_*.html
+fixtures/real_*.html
