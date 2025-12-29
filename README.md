@@ -34,10 +34,25 @@ Think of it as a build pipeline for content: stable inputs produce stable output
 - Jekyll site structure with layouts
 - Comprehensive test suite
 
+## Installation
+
+```bash
+pip install artifactor
+```
+
+For development:
+
+```bash
+git clone https://github.com/K-reel/artifactor.git
+cd artifactor
+pip install -e ".[dev]"
+```
+
 ## Versioning
 
+- **v0.2.0**: Configuration system, adapter debugging tools, repo-root packaging, trusted publishing
+- **v0.1.1**: CI workflow (offline-only, runs on every push/PR)
 - **v0.1.0**: Initial release (scaffold + ingest + offline fixture mode)
-- **v0.1.1**: Adds CI workflow (offline-only, runs on every push/PR)
 
 ## Repository Structure
 
@@ -72,7 +87,25 @@ artifactor/
 
 ## Quick Start
 
-Get started with Artifactor in four simple commands:
+### For Users
+
+```bash
+# Install from PyPI
+pip install artifactor
+
+# Validate your configuration (creates default config if needed)
+artifactor config validate
+
+# Ingest URLs from a file
+artifactor ingest --urls urls.txt
+
+# List available adapters
+artifactor adapters list
+```
+
+### For Developers
+
+Get started with the development environment in four simple commands:
 
 ### 1. Install Dependencies
 
