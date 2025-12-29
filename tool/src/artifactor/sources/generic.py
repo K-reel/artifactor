@@ -5,7 +5,7 @@ from urllib.parse import urlparse
 from bs4 import BeautifulSoup
 from dateutil import parser as dateparser
 
-from .base import SourceAdapter
+from .base import SourceAdapter, AdapterMetadata
 from artifactor.models import Article
 
 
@@ -15,6 +15,15 @@ class GenericAdapter(SourceAdapter):
     def can_handle(self, url: str) -> bool:
         """Generic adapter can handle any URL."""
         return True
+
+    def get_metadata(self) -> AdapterMetadata:
+        """Return metadata for generic adapter."""
+        return AdapterMetadata(
+            name="generic",
+            description="Generic fallback for any website",
+            priority=10,
+            match_patterns=["*"],
+        )
 
     def extract(self, url: str, html: str) -> Article:
         """Extract article content using generic extraction."""

@@ -12,6 +12,7 @@ from .config import ArtifactorConfig, load_config, discover_config_file
 from .config.loader import config_to_dict
 from .generator import PostGenerator
 from .ingest import Ingester, IngestStatus
+from .sources.registry import get_registry
 
 # Main app
 app = typer.Typer(
@@ -24,6 +25,10 @@ app = typer.Typer(
 config_app = typer.Typer(help="Configuration management commands")
 app.add_typer(config_app, name="config")
 
+
+# Adapters subcommand app
+adapters_app = typer.Typer(help="Adapter management and debugging commands")
+app.add_typer(adapters_app, name="adapters")
 
 @app.callback(invoke_without_command=True)
 def callback(ctx: typer.Context):
@@ -164,6 +169,81 @@ def config_print(
     except Exception as e:
         typer.echo(f"Unexpected error: {e}", err=True)
         raise typer.Exit(1)
+
+
+
+@adapters_app.command(name="list")
+def adapters_list():
+    """List all registered adapters in priority order.
+
+    Shows adapter name, priority, and description for each registered adapter.
+    Output is deterministically ordered by priority (high to low).
+
+    Example:
+        artifactor adapters list
+    """
+    registry = get_registry()
+    adapters = registry.get_all_adapters()
+
+    typer.echo("Registered adapters (priority order):")
+    typer.echo()
+
+    for adapter in adapters:
+        metadata = adapter.get_metadata()
+        typer.echo(f"  {metadata.name}")
+        typer.echo(f"    Priority: {metadata.priority}")
+        typer.echo(f"    Description: {metadata.description}")
+        if metadata.match_patterns:
+            typer.echo(f"    Patterns: {', '.join(metadata.match_patterns)}")
+        typer.echo()
+
+
+@adapters_app.command(name="debug")
+def adapters_debug(
+    url: Annotated[
+        str,
+        typer.Argument(help="URL to debug adapter selection for"),
+    ],
+):
+    """Debug adapter selection for a specific URL.
+
+    Shows which adapters can handle the URL and explains the selection process.
+    Output is deterministically ordered by priority (high to low).
+
+    Example:
+        artifactor adapters debug https://socket.dev/blog/example
+    """
+    registry = get_registry()
+
+    debug_info = registry.debug_selection(url)
+
+    typer.echo(f"Debugging adapter selection for: {url}")
+    typer.echo()
+
+    selected_adapter = None
+    for info in debug_info:
+        if info["can_handle"] and selected_adapter is None:
+            selected_adapter = info["name"]
+
+    for info in debug_info:
+        status = "✓ SELECTED" if (info["can_handle"] and info["name"] == selected_adapter) else (
+            "✓ matches" if info["can_handle"] else "✗ no match"
+        )
+
+        typer.echo(f"  [{status}] {info['name']}")
+        typer.echo(f"    Priority: {info['priority']}")
+        typer.echo(f"    Can handle: {info['can_handle']}")
+        typer.echo(f"    Match score: {info['match_score']}")
+        typer.echo(f"    Description: {info['description']}")
+        if info["match_patterns"]:
+            typer.echo(f"    Patterns: {', '.join(info['match_patterns'])}")
+
+        typer.echo()
+
+    if selected_adapter:
+        typer.echo(f"Result: Will use '{selected_adapter}' adapter")
+    else:
+        typer.echo("Result: No adapter can handle this URL (this should not happen)")
 
 
 @app.command(name="scaffold")

@@ -6,7 +6,7 @@ from urllib.parse import urlparse
 from bs4 import BeautifulSoup
 from dateutil import parser as dateparser
 
-from .base import SourceAdapter
+from .base import SourceAdapter, AdapterMetadata
 from artifactor.models import Article
 
 
@@ -17,6 +17,15 @@ class SocketBlogAdapter(SourceAdapter):
         """Check if URL is from Socket blog."""
         parsed = urlparse(url)
         return parsed.netloc in ("socket.dev", "www.socket.dev") and "/blog/" in parsed.path
+
+    def get_metadata(self) -> AdapterMetadata:
+        """Return metadata for Socket blog adapter."""
+        return AdapterMetadata(
+            name="socket",
+            description="Socket.dev security blog posts",
+            priority=80,
+            match_patterns=["socket.dev/blog/*", "www.socket.dev/blog/*"],
+        )
 
     def extract(self, url: str, html: str) -> Article:
         """Extract article content from Socket blog HTML."""

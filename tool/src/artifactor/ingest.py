@@ -2,14 +2,16 @@
 
 import hashlib
 from pathlib import Path
-from typing import List, Optional
+from typing import List, Optional, TYPE_CHECKING
 from enum import Enum
 
 from .fetch import fetch_url, FetchResult
 from .generator import PostGenerator
 from .models import Article
-from .sources.socket_blog import SocketBlogAdapter
-from .sources.generic import GenericAdapter
+from .sources.registry import get_registry
+
+if TYPE_CHECKING:
+    from .config import ArtifactorConfig
 
 
 class IngestStatus(Enum):
@@ -43,22 +45,22 @@ class Ingester:
     def __init__(
         self,
         output_dir: Path,
+        posts_dir: Optional[Path] = None,
         timeout: int = 20,
         user_agent: str = "Artifactor/0.1 (+https://github.com/K-reel/artifactor)",
         dry_run: bool = False,
         html_fixture: Optional[Path] = None,
+        config: Optional["ArtifactorConfig"] = None,
     ):
         self.output_dir = output_dir
-        self.posts_dir = output_dir / "_posts"
+        self.posts_dir = posts_dir if posts_dir else (output_dir / "_posts")
         self.timeout = timeout
         self.user_agent = user_agent
         self.dry_run = dry_run
         self.html_fixture = html_fixture
+        self.config = config
         self.generator = PostGenerator()
-        self.adapters = [
-            SocketBlogAdapter(),
-            GenericAdapter(),  # Fallback
-        ]
+        self.registry = get_registry()
 
     def read_urls(self, urls_file: Path) -> List[str]:
         """Read and parse URLs from file.
@@ -114,7 +116,7 @@ class Ingester:
                 final_url = result.final_url
 
             # Select adapter
-            adapter = self._select_adapter(final_url)
+            adapter, explanation = self.registry.select_adapter(final_url)
 
             # Extract article
             article = adapter.extract(final_url, html)
@@ -177,11 +179,3 @@ class Ingester:
             results.append(result)
 
         return results
-
-    def _select_adapter(self, url: str):
-        """Select the appropriate adapter for a URL."""
-        for adapter in self.adapters:
-            if adapter.can_handle(url):
-                return adapter
-        # Should never reach here since GenericAdapter handles everything
-        return self.adapters[-1]
