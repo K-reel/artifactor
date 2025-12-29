@@ -119,8 +119,11 @@ class Ingester:
                 html = result.html
                 final_url = result.final_url
 
-            # Select adapter
-            adapter, explanation = self.registry.select_adapter(final_url)
+            # Select adapter (with forced adapter from config if specified)
+            forced_adapter = self.config.ingest.force_adapter if self.config else None
+            fallback_adapter = self.config.input.default_adapter if self.config else "generic"
+
+            adapter, explanation = self._select_adapter(final_url, forced_adapter, fallback_adapter)
 
             # Print explanation to stderr if requested
             if self.explain:
@@ -187,3 +190,20 @@ class Ingester:
             results.append(result)
 
         return results
+
+    def _select_adapter(
+        self, url: str, forced_adapter: Optional[str] = None, fallback_adapter: str = "generic"
+    ):
+        """Select the appropriate adapter for a URL.
+
+        Args:
+            url: URL to select adapter for
+            forced_adapter: Optional adapter name to force selection
+            fallback_adapter: Adapter to use when no adapter matches (default: generic)
+
+        Returns:
+            Tuple of (adapter, explanation)
+        """
+        return self.registry.select_adapter(
+            url, force_adapter=forced_adapter, fallback_adapter=fallback_adapter
+        )

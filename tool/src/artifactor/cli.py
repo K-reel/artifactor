@@ -418,6 +418,13 @@ def ingest(
             help="Fallback date for articles without dates (YYYY-MM-DD)",
         ),
     ] = None,
+    adapter: Annotated[
+        Optional[str],
+        typer.Option(
+            "--adapter",
+            help="Force specific adapter (overrides automatic selection)",
+        ),
+    ] = None,
     explain: Annotated[
         bool,
         typer.Option(
@@ -467,6 +474,7 @@ def ingest(
             offline=offline,
             require_date=require_date,
             fallback_date=fallback_date,
+            force_adapter=adapter,
         )
 
     except (FileNotFoundError, ValueError) as e:

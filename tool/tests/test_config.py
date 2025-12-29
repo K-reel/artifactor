@@ -361,6 +361,7 @@ def test_config_deterministic_fallback_date_null():
     today = date.today().strftime("%Y-%m-%d")
     assert config.ingest.date.fallback_date != today
 
+
 def test_config_file_site_dir_respected_without_cli_override():
     """Test that config file site_dir is used when CLI doesn't specify --out."""
     # Load config from dict with custom site_dir
