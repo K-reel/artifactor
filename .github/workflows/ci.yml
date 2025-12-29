@@ -32,3 +32,9 @@ jobs:
       run: |
         cd tool
         python3 -m pytest tests/test_generator.py::test_generate_post_deterministic_file -v
+
+    - name: Build distribution packages
+      run: python3 -m build
+
+    - name: Verify package metadata
+      run: python3 -m twine check dist/*

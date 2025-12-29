@@ -7,7 +7,7 @@ help: ## Show this help message
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2}'
 
 install: ## Install Python package and dependencies
-	cd tool && pip3 install -e ".[dev]"
+	pip3 install -e ".[dev]"
 	@echo ""
 	@echo "✓ Artifactor installed successfully"
 	@echo "  Run 'make scaffold' to generate a sample post"
@@ -28,7 +28,7 @@ ingest: ## Ingest URLs (offline demo, dry-run)
 	@echo "  python3 -m artifactor ingest --urls your_urls.txt --out site/"
 
 test: ## Run test suite
-	cd tool && python3 -m pytest -v
+	python3 -m pytest -v
 	@echo ""
 	@echo "✓ All tests passed"
 
