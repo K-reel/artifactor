@@ -25,10 +25,10 @@ app = typer.Typer(
 config_app = typer.Typer(help="Configuration management commands")
 app.add_typer(config_app, name="config")
 
-
 # Adapters subcommand app
 adapters_app = typer.Typer(help="Adapter management and debugging commands")
 app.add_typer(adapters_app, name="adapters")
+
 
 @app.callback(invoke_without_command=True)
 def callback(ctx: typer.Context):
@@ -171,7 +171,6 @@ def config_print(
         raise typer.Exit(1)
 
 
-
 @adapters_app.command(name="list")
 def adapters_list():
     """List all registered adapters in priority order.
@@ -204,18 +203,37 @@ def adapters_debug(
         str,
         typer.Argument(help="URL to debug adapter selection for"),
     ],
+    html_fixture: Annotated[
+        Optional[Path],
+        typer.Option(
+            "--html-fixture",
+            help="HTML fixture file for offline extraction testing",
+            exists=True,
+            dir_okay=False,
+        ),
+    ] = None,
 ):
     """Debug adapter selection for a specific URL.
 
     Shows which adapters can handle the URL and explains the selection process.
     Output is deterministically ordered by priority (high to low).
 
+    With --html-fixture, tests extraction for matching adapters offline.
+
     Example:
         artifactor adapters debug https://socket.dev/blog/example
+        artifactor adapters debug https://example.com/post --html-fixture test.html
     """
     registry = get_registry()
 
-    debug_info = registry.debug_selection(url)
+    # Load HTML if fixture provided
+    html = None
+    if html_fixture:
+        html = html_fixture.read_text(encoding="utf-8")
+        typer.echo(f"Using HTML fixture: {html_fixture}")
+        typer.echo()
+
+    debug_info = registry.debug_selection(url, html=html)
 
     typer.echo(f"Debugging adapter selection for: {url}")
     typer.echo()
@@ -237,6 +255,17 @@ def adapters_debug(
         typer.echo(f"    Description: {info['description']}")
         if info["match_patterns"]:
             typer.echo(f"    Patterns: {', '.join(info['match_patterns'])}")
+
+        # Show extraction results if HTML was provided
+        if "extraction_success" in info:
+            if info["extraction_success"]:
+                typer.echo(f"    Extraction: SUCCESS")
+                if "extracted_title" in info:
+                    typer.echo(f"    Title preview: {info['extracted_title']}")
+            else:
+                typer.echo(f"    Extraction: FAILED")
+                if "extraction_error" in info:
+                    typer.echo(f"    Error: {info['extraction_error']}")
 
         typer.echo()
 
@@ -389,6 +418,13 @@ def ingest(
             help="Fallback date for articles without dates (YYYY-MM-DD)",
         ),
     ] = None,
+    explain: Annotated[
+        bool,
+        typer.Option(
+            "--explain",
+            help="Show adapter selection explanation for each URL",
+        ),
+    ] = False,
 ):
     """Ingest URLs and generate Jekyll posts.
 
@@ -463,6 +499,7 @@ def ingest(
         dry_run=dry_run,
         html_fixture=html_fixture,
         config=config,
+        explain=explain,
     )
 
     # Read URLs from file

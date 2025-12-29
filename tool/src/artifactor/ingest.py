@@ -5,6 +5,8 @@ from pathlib import Path
 from typing import List, Optional, TYPE_CHECKING
 from enum import Enum
 
+import typer
+
 from .fetch import fetch_url, FetchResult
 from .generator import PostGenerator
 from .models import Article
@@ -51,6 +53,7 @@ class Ingester:
         dry_run: bool = False,
         html_fixture: Optional[Path] = None,
         config: Optional["ArtifactorConfig"] = None,
+        explain: bool = False,
     ):
         self.output_dir = output_dir
         self.posts_dir = posts_dir if posts_dir else (output_dir / "_posts")
@@ -59,6 +62,7 @@ class Ingester:
         self.dry_run = dry_run
         self.html_fixture = html_fixture
         self.config = config
+        self.explain = explain
         self.generator = PostGenerator()
         self.registry = get_registry()
 
@@ -117,6 +121,10 @@ class Ingester:
 
             # Select adapter
             adapter, explanation = self.registry.select_adapter(final_url)
+
+            # Print explanation to stderr if requested
+            if self.explain:
+                typer.echo(f"  {explanation}", err=True)
 
             # Extract article
             article = adapter.extract(final_url, html)
