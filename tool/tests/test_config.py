@@ -361,3 +361,53 @@ def test_config_deterministic_fallback_date_null():
     today = date.today().strftime("%Y-%m-%d")
     assert config.ingest.date.fallback_date != today
 
+def test_config_file_site_dir_respected_without_cli_override():
+    """Test that config file site_dir is used when CLI doesn't specify --out."""
+    # Load config from dict with custom site_dir
+    data = {"version": 1, "output": {"site_dir": "custom-site"}}
+    config = load_config_from_dict(data)
+
+    # Merge with no site_dir override (None)
+    merged = config.merge_cli_overrides(site_dir=None)
+
+    # Config file value should be preserved
+    assert merged.output.site_dir == "custom-site"
+
+
+def test_config_file_site_dir_overridden_by_explicit_cli():
+    """Test that CLI --out explicitly overrides config file site_dir."""
+    # Load config from dict with custom site_dir
+    data = {"version": 1, "output": {"site_dir": "custom-site"}}
+    config = load_config_from_dict(data)
+
+    # Merge with explicit site_dir override
+    merged = config.merge_cli_overrides(site_dir=Path("cli-override-site"))
+
+    # CLI value should win
+    assert merged.output.site_dir == "cli-override-site"
+
+
+def test_config_file_posts_dir_respected_without_cli_override():
+    """Test that config file posts_dir is used when CLI doesn't specify --posts-dir."""
+    # Load config from dict with custom posts_dir
+    data = {"version": 1, "output": {"posts_dir": "custom-site/custom-posts"}}
+    config = load_config_from_dict(data)
+
+    # Merge with no posts_dir override (None)
+    merged = config.merge_cli_overrides(posts_dir=None)
+
+    # Config file value should be preserved
+    assert merged.output.posts_dir == "custom-site/custom-posts"
+
+
+def test_config_file_posts_dir_overridden_by_explicit_cli():
+    """Test that CLI --posts-dir explicitly overrides config file posts_dir."""
+    # Load config from dict with custom posts_dir
+    data = {"version": 1, "output": {"posts_dir": "custom-site/custom-posts"}}
+    config = load_config_from_dict(data)
+
+    # Merge with explicit posts_dir override
+    merged = config.merge_cli_overrides(posts_dir=Path("cli-posts"))
+
+    # CLI value should win
+    assert merged.output.posts_dir == "cli-posts"
