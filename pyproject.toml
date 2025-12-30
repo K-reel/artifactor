@@ -8,9 +8,6 @@ description = "Deterministic CLI that ingests article URLs/HTML and emits Jekyll
 readme = "README.md"
 requires-python = ">=3.10"
 dynamic = ["version"]
-authors = [
-    {name = "Kirill Anokhin"}
-]
 classifiers = [
     "Development Status :: 3 - Alpha",
     "Intended Audience :: Developers",
